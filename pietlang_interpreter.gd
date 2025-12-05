@@ -1,6 +1,8 @@
 class_name PietlangInterpreter
 extends Node
 
+signal executed_instruction(instruction: StringName)
+
 const DP_RIGHT = 0
 const DP_DOWN = 1
 const DP_LEFT = 2
@@ -88,10 +90,12 @@ func step() -> void:
 			dp_position += Vector2i.UP
 	
 	var instruction := get_instruction(previous_color, source_image.get_pixelv(dp_position))
-	print(instruction)
 	match instruction:
 		&"switch":
 			piet_switch()
+	
+	executed_instruction.emit(instruction)
+	
 
 
 static func get_instruction(previous_color: Color, current_color: Color) -> StringName:
