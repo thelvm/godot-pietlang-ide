@@ -1,0 +1,59 @@
+[gd_scene load_steps=5 format=3 uid="uid://bxrxbs3158s50"]
+
+[ext_resource type="Script" uid="uid://y7ami2ldov1m" path="res://main.gd" id="1_ig7tw"]
+[ext_resource type="Script" uid="uid://cds82uvwogchw" path="res://pietlang_interpreter.gd" id="2_0xm2m"]
+[ext_resource type="Texture2D" uid="uid://buukcn6qwoew0" path="res://right-arrow.png" id="2_1bvp3"]
+[ext_resource type="Script" uid="uid://cabqtn5b0kawc" path="res://dp_image.gd" id="3_lquwl"]
+
+[node name="Main" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("1_ig7tw")
+
+[node name="GridContainer" type="GridContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+columns = 2
+
+[node name="CodeImage" type="TextureRect" parent="GridContainer"]
+unique_name_in_owner = true
+texture_filter = 1
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+expand_mode = 1
+stretch_mode = 5
+
+[node name="DpImage" type="Sprite2D" parent="GridContainer/CodeImage"]
+position = Vector2(229, 305)
+texture = ExtResource("2_1bvp3")
+script = ExtResource("3_lquwl")
+
+[node name="Button" type="Button" parent="GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+text = "Step"
+
+[node name="ImportSourceImageButton" type="Button" parent="GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+text = "Import Image"
+
+[node name="PietlangInterpreter" type="Node" parent="."]
+unique_name_in_owner = true
+script = ExtResource("2_0xm2m")
+
+[connection signal="pressed" from="GridContainer/Button" to="PietlangInterpreter" method="step"]
+[connection signal="pressed" from="GridContainer/ImportSourceImageButton" to="." method="_on_import_source_image_button_pressed"]
