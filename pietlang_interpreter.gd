@@ -2,6 +2,7 @@ class_name PietlangInterpreter
 extends Node
 
 signal executed_instruction(instruction: StringName)
+signal stack_updated()
 
 const DP_RIGHT = 0
 const DP_DOWN = 1
@@ -70,7 +71,7 @@ const INSTRUCTIONS: Dictionary[Array, StringName] = {
 
 var source_image: Image
 
-var stack: PackedInt64Array = []
+var stack: PackedByteArray = []
 var dp_direction: int = DP_RIGHT
 var cc_direction: int = CC_LEFT
 var dp_position: Vector2i = Vector2i(0, 0)
@@ -95,7 +96,6 @@ func step() -> void:
 			piet_switch()
 	
 	executed_instruction.emit(instruction)
-	
 
 
 static func get_instruction(previous_color: Color, current_color: Color) -> StringName:
