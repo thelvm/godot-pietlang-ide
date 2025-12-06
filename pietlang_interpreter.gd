@@ -286,6 +286,13 @@ func piet_mod() -> void:
 	stack_updated.emit()
 
 
+##  Pops the top two values off the stack, and pushes 1 on to the stack if the second top value is greater than the top value, and pushes 0 if it is not greater.
+func piet_greater() -> void:
+	var top_value := stack.pop()
+	var bottom_value := stack.pop()
+	stack.push(bottom_value > top_value)
+
+
 ## Pushes the value of the colour block just exited on to the stack.
 func piet_push(value: int) -> void:
 	stack.push(value)
@@ -298,6 +305,13 @@ func piet_switch() -> void:
 		var value = stack.get(stack.size())
 		stack.remove_at(stack.size() - 1)
 		cc_direction = (cc_direction + abs(value)) % 2
+
+
+## Pops the top value off the stack and rotates the DP clockwise that many steps (anticlockwise if negative).
+func piet_pointer() -> void:
+	var value := stack.pop()
+	dp_direction += value % 4
+
 
 ## Pushes a copy of the top value on the stack on to the stack.
 func piet_duplicate() -> void:
