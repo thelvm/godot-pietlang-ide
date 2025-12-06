@@ -79,18 +79,11 @@ var dp_position: Vector2i = Vector2i(0, 0)
 
 func step() -> void:
 	var previous_color := source_image.get_pixelv(dp_position)
-	
-	match dp_direction:
-		DP_RIGHT:
-			dp_position += Vector2i.RIGHT
-		DP_DOWN:
-			dp_position += Vector2i.DOWN
-		DP_LEFT:
-			dp_position += Vector2i.LEFT
-		DP_UP:
-			dp_position += Vector2i.UP
+	var color_block := get_color_block(dp_position, previous_color)
+	dp_position = get_next_codel_from_color_block(color_block)
 	
 	var instruction := get_instruction(previous_color, source_image.get_pixelv(dp_position))
+	
 	match instruction:
 		&"add":
 			piet_add()
@@ -102,6 +95,12 @@ func step() -> void:
 			piet_divide()
 		&"switch":
 			piet_switch()
+		&"push":
+			piet_push(color_block.size())
+		&"duplicate":
+			piet_duplicate()
+		&"pop":
+			piet_pop()
 	
 	executed_instruction.emit(instruction)
 	#stack.push(dp_position.x + 64)
@@ -112,7 +111,7 @@ static func get_instruction(previous_color: Color, current_color: Color) -> Stri
 	var previous_pietcolor := color_to_pietcolor(previous_color)
 	var current_pietcolor := color_to_pietcolor(current_color)
 	if not previous_pietcolor.is_empty() and not current_pietcolor.is_empty():
-		var hue_diff := posmod(previous_pietcolor[0] - current_pietcolor[0], 6)
+		var hue_diff := posmod(current_pietcolor[0] - previous_pietcolor[0], 6)
 		var light_diff := posmod(previous_pietcolor[1] - current_pietcolor[1], 3)
 		return INSTRUCTIONS.get([hue_diff, light_diff], &"Unknown instruction")
 	else:
@@ -123,6 +122,125 @@ static func get_instruction(previous_color: Color, current_color: Color) -> Stri
 static func color_to_pietcolor(color: Color) -> PackedInt32Array:
 	var piet_color: PackedInt32Array = PIET_COLORS.get(color.to_html(false), [])
 	return piet_color
+
+
+## Returns all the codels belonging to the color block of which start_codel is a part of.
+func get_color_block(start_codel: Vector2i, start_codel_color: Color) -> Array[Vector2i]:
+	var to_explore: Array[Vector2i] = [start_codel]
+	var part_of_block: Array[Vector2i] = []
+	
+	while not to_explore.is_empty():
+		var current: Vector2i = to_explore.pop_back()
+		part_of_block.append(current)
+		
+		# right
+		if current.x + 1 < source_image.get_width():
+			var right := Vector2i(current.x + 1, current.y)
+			if source_image.get_pixelv(right) == start_codel_color and not part_of_block.has(right) and not to_explore.has(right):
+				to_explore.append(right)
+
+		# left
+		if current.x - 1 >= 0:
+			var left := Vector2i(current.x - 1, current.y)
+			if source_image.get_pixelv(left) == start_codel_color and not part_of_block.has(left) and not to_explore.has(left):
+				to_explore.append(left)
+
+		# down
+		if current.y + 1 < source_image.get_height():
+			var down := Vector2i(current.x, current.y + 1)
+			if source_image.get_pixelv(down) == start_codel_color and not part_of_block.has(down) and not to_explore.has(down):
+				to_explore.append(down)
+
+		# up
+		if current.y - 1 >= 0:
+			var up := Vector2i(current.x, current.y - 1)
+			if source_image.get_pixelv(up) == start_codel_color and not part_of_block.has(up) and not to_explore.has(up):
+				to_explore.append(up)
+	
+	return part_of_block
+
+
+## Given the color block, uses the current dp_position, dp_direction and cc_direction to figure out the next codel.
+func get_next_codel_from_color_block(color_block: Array[Vector2i]) -> Vector2i:
+	var target_codel := Vector2i(0, 0)
+
+	if dp_direction == DP_RIGHT:
+		# Find rightmost codel
+		for codel in color_block:
+			if codel.x > target_codel.x:
+				target_codel = codel
+		
+		if cc_direction == CC_LEFT:
+			# Among rightmost, choose topmost
+			for codel in color_block:
+				if codel.x == target_codel.x and codel.y < target_codel.y:
+					target_codel = codel
+		elif cc_direction == CC_RIGHT:
+			# Among rightmost, choose bottommost
+			for codel in color_block:
+				if codel.x == target_codel.x and codel.y > target_codel.y:
+					target_codel = codel
+		
+		return target_codel + Vector2i(1, 0)
+
+	elif dp_direction == DP_LEFT:
+		# Find leftmost codel
+		for codel in color_block:
+			if codel.x < target_codel.x:
+				target_codel = codel
+		
+		if cc_direction == CC_LEFT:
+			# Among leftmost, choose bottommost
+			for codel in color_block:
+				if codel.x == target_codel.x and codel.y > target_codel.y:
+					target_codel = codel
+		elif cc_direction == CC_RIGHT:
+			# Among leftmost, choose topmost
+			for codel in color_block:
+				if codel.x == target_codel.x and codel.y < target_codel.y:
+					target_codel = codel
+		
+		return target_codel + Vector2i(-1, 0)
+
+	elif dp_direction == DP_UP:
+		# Find topmost codel
+		for codel in color_block:
+			if codel.y < target_codel.y:
+				target_codel = codel
+		
+		if cc_direction == CC_LEFT:
+			# Among topmost, choose leftmost
+			for codel in color_block:
+				if codel.y == target_codel.y and codel.x < target_codel.x:
+					target_codel = codel
+		elif cc_direction == CC_RIGHT:
+			# Among topmost, choose rightmost
+			for codel in color_block:
+				if codel.y == target_codel.y and codel.x > target_codel.x:
+					target_codel = codel
+		
+		return target_codel + Vector2i(0, -1)
+
+	elif dp_direction == DP_DOWN:
+		# Find bottommost codel
+		for codel in color_block:
+			if codel.y > target_codel.y:
+				target_codel = codel
+		
+		if cc_direction == CC_LEFT:
+			# Among bottommost, choose rightmost
+			for codel in color_block:
+				if codel.y == target_codel.y and codel.x > target_codel.x:
+					target_codel = codel
+		elif cc_direction == CC_RIGHT:
+			# Among bottommost, choose leftmost
+			for codel in color_block:
+				if codel.y == target_codel.y and codel.x < target_codel.x:
+					target_codel = codel
+		
+		return target_codel + Vector2i(0, 1)
+	
+	return Vector2i(-1, -1) # Something went wrong
 
 
 ## Pops the top two values off the stack, adds them, and pushes the result back on the stack.
@@ -165,10 +283,38 @@ func piet_mod() -> void:
 		return
 	var value: int = posmod(bottom_value, top_value) * sign(top_value)
 	stack.push(value)
+	stack_updated.emit()
 
 
+## Pushes the value of the colour block just exited on to the stack.
+func piet_push(value: int) -> void:
+	stack.push(value)
+	stack_updated.emit()
+
+
+## Pops the top value off the stack and toggles the CC that many times (the absolute value of that many times if negative).
 func piet_switch() -> void:
 	if not stack.is_empty():
 		var value = stack.get(stack.size())
 		stack.remove_at(stack.size() - 1)
 		cc_direction = (cc_direction + abs(value)) % 2
+
+## Pushes a copy of the top value on the stack on to the stack.
+func piet_duplicate() -> void:
+	var value := stack.pop()
+	stack.push(value)
+	stack.push(value)
+	stack_updated.emit()
+
+
+## Pops the top value off the stack and discards it.
+func piet_pop() -> void:
+	stack.pop()
+
+
+## Pops the top two values off the stack and "rolls" the remaining stack entries to a depth equal to the second value popped, by a number of rolls equal to the first value popped. A single roll to depth n is defined as burying the top value on the stack n deep and bringing all values above it up by 1 place. A negative number of rolls rolls in the opposite direction.
+func piet_roll() -> void:
+	var roll_steps := stack.pop()
+	var roll_depth := stack.pop()
+	stack.roll(roll_depth, roll_steps)
+	stack_updated.emit()
