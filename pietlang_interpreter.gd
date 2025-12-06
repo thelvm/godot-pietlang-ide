@@ -71,7 +71,7 @@ const INSTRUCTIONS: Dictionary[Array, StringName] = {
 
 var source_image: Image
 
-var stack: PackedByteArray = []
+var stack: Stack = Stack.new()
 var dp_direction: int = DP_RIGHT
 var cc_direction: int = CC_LEFT
 var dp_position: Vector2i = Vector2i(0, 0)
@@ -92,10 +92,20 @@ func step() -> void:
 	
 	var instruction := get_instruction(previous_color, source_image.get_pixelv(dp_position))
 	match instruction:
+		&"add":
+			piet_add()
+		&"substract":
+			piet_substract()
+		&"multiply":
+			piet_multiply()
+		&"divide":
+			piet_divide()
 		&"switch":
 			piet_switch()
 	
 	executed_instruction.emit(instruction)
+	#stack.push(dp_position.x + 64)
+	#stack_updated.emit()
 
 
 static func get_instruction(previous_color: Color, current_color: Color) -> StringName:
@@ -113,6 +123,48 @@ static func get_instruction(previous_color: Color, current_color: Color) -> Stri
 static func color_to_pietcolor(color: Color) -> PackedInt32Array:
 	var piet_color: PackedInt32Array = PIET_COLORS.get(color.to_html(false), [])
 	return piet_color
+
+
+## Pops the top two values off the stack, adds them, and pushes the result back on the stack.
+func piet_add() -> void:
+	stack.push(stack.pop() + stack.pop())
+	stack_updated.emit()
+
+
+## Pops the top two values off the stack, calculates the second top value minus the top value, and pushes the result back on the stack.
+func piet_substract() -> void:
+	var top_value := stack.pop()
+	var bottom_value := stack.pop()
+	stack.push(bottom_value - top_value)
+	stack_updated.emit()
+
+
+## Pops the top two values off the stack, multiplies them, and pushes the result back on the stack.
+func piet_multiply() -> void:
+	stack.push(stack.pop() * stack.pop())
+	stack_updated.emit()
+
+
+## Pops the top two values off the stack, calculates the integer division of the second top value by the top value, and pushes the result back on the stack.
+func piet_divide() -> void:
+	var top_value := stack.pop()
+	var bottom_value := stack.pop()
+	if bottom_value == 0:
+		return
+	
+	@warning_ignore("integer_division")
+	stack.push(bottom_value / top_value)
+	stack_updated.emit()
+
+
+## Pops the top two values off the stack, calculates the second top value modulo the top value, and pushes the result back on the stack. The result has the same sign as the divisor (the top value).
+func piet_mod() -> void:
+	var top_value := stack.pop()
+	var bottom_value := stack.pop()
+	if top_value == 0:
+		return
+	var value: int = posmod(bottom_value, top_value) * sign(top_value)
+	stack.push(value)
 
 
 func piet_switch() -> void:
