@@ -9,7 +9,6 @@ func _ready() -> void:
 
 func _on_pietlang_interpreter_stack_updated() -> void:
 	var int_stack := pietlang_interpreter.stack.as_array()
-	var byte_stack := int_stack.to_byte_array()
 	for child in get_children():
 		child.queue_free()
 	
@@ -22,7 +21,7 @@ func _on_pietlang_interpreter_stack_updated() -> void:
 		hbox.add_child(label_int)
 		
 		var label_char := Label.new()
-		label_char.text = byte_stack.slice(i * 8, (i * 8) + 8).get_string_from_ascii()
+		label_char.text = char(int_stack[i])
 		hbox.add_child(label_char)
 		
 		add_child(hbox)
