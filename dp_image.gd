@@ -35,5 +35,21 @@ func _process(_delta: float) -> void:
 		# Offset so it's in the middle of the codel
 		position.x += codel_size_on_screen.x / 2
 		position.y += codel_size_on_screen.y / 2
+		
+		match pietlang_interpreter.dp_direction:
+			PietlangInterpreter.DP_RIGHT:
+				rotation_degrees = 0
+			PietlangInterpreter.DP_DOWN:
+				rotation_degrees = 90
+			PietlangInterpreter.DP_LEFT:
+				rotation_degrees = 180
+			PietlangInterpreter.DP_UP:
+				rotation_degrees = 270
+		match pietlang_interpreter.cc_direction:
+			PietlangInterpreter.CC_LEFT:
+				flip_v = false
+			PietlangInterpreter.CC_RIGHT:
+				flip_v = true
+		
 	else:
 		visible = 0

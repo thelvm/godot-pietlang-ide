@@ -2,6 +2,7 @@ class_name PietlangInterpreter
 extends Node
 
 signal executed_instruction(instruction: StringName)
+signal outputed(value: String)
 signal stack_updated()
 
 const DP_RIGHT = 0
@@ -71,7 +72,7 @@ const INSTRUCTIONS: Dictionary[Array, StringName] = {
 
 var source_image: Image
 
-var stack: PackedByteArray = []
+var stack: Stack = Stack.new()
 var dp_direction: int = DP_RIGHT
 var cc_direction: int = CC_LEFT
 var dp_position: Vector2i = Vector2i(0, 0)
@@ -79,21 +80,58 @@ var dp_position: Vector2i = Vector2i(0, 0)
 
 func step() -> void:
 	var previous_color := source_image.get_pixelv(dp_position)
+	var color_block := get_color_block(dp_position, previous_color)
 	
-	match dp_direction:
-		DP_RIGHT:
-			dp_position += Vector2i.RIGHT
-		DP_DOWN:
-			dp_position += Vector2i.DOWN
-		DP_LEFT:
-			dp_position += Vector2i.LEFT
-		DP_UP:
-			dp_position += Vector2i.UP
+	var valid_next_position := false
+	var rotations := 0
+	while not valid_next_position:
+		var potential_position := get_next_codel_from_color_block(color_block)
+		if potential_position.x < source_image.get_width() and 0 <= potential_position.x and potential_position.y < source_image.get_height() and 0 <= potential_position.y and source_image.get_pixelv(potential_position) != Color.BLACK:
+			valid_next_position = true
+			dp_position = potential_position
+		else:
+			if rotations % 2 == 0:
+				cc_direction = (cc_direction + 1) % 2
+			if rotations % 2 == 1:
+				dp_direction = (dp_direction + 1) % 4
+			rotations += 1
+			if rotations >= 8:
+				push_warning("Stuck")
+				return
 	
 	var instruction := get_instruction(previous_color, source_image.get_pixelv(dp_position))
+	
 	match instruction:
+		&"add":
+			piet_add()
+		&"substract":
+			piet_substract()
+		&"multiply":
+			piet_multiply()
+		&"divide":
+			piet_divide()
 		&"switch":
 			piet_switch()
+		&"mod":
+			piet_mod()
+		&"greater":
+			piet_greater()
+		&"push":
+			piet_push(color_block.size())
+		&"switch":
+			piet_switch()
+		&"pointer":
+			piet_pointer()
+		&"duplicate":
+			piet_duplicate()
+		&"pop":
+			piet_pop()
+		&"roll":
+			piet_roll()
+		&"out_char":
+			piet_out_char()
+		&"out_number":
+			piet_out_number()
 	
 	executed_instruction.emit(instruction)
 
@@ -102,7 +140,7 @@ static func get_instruction(previous_color: Color, current_color: Color) -> Stri
 	var previous_pietcolor := color_to_pietcolor(previous_color)
 	var current_pietcolor := color_to_pietcolor(current_color)
 	if not previous_pietcolor.is_empty() and not current_pietcolor.is_empty():
-		var hue_diff := posmod(previous_pietcolor[0] - current_pietcolor[0], 6)
+		var hue_diff := posmod(current_pietcolor[0] - previous_pietcolor[0], 6)
 		var light_diff := posmod(previous_pietcolor[1] - current_pietcolor[1], 3)
 		return INSTRUCTIONS.get([hue_diff, light_diff], &"Unknown instruction")
 	else:
@@ -115,8 +153,223 @@ static func color_to_pietcolor(color: Color) -> PackedInt32Array:
 	return piet_color
 
 
+## Returns all the codels belonging to the color block of which start_codel is a part of.
+func get_color_block(start_codel: Vector2i, start_codel_color: Color) -> Array[Vector2i]:
+	var to_explore: Array[Vector2i] = [start_codel]
+	var part_of_block: Array[Vector2i] = []
+	
+	while not to_explore.is_empty():
+		var current: Vector2i = to_explore.pop_back()
+		part_of_block.append(current)
+		
+		# right
+		if current.x + 1 < source_image.get_width():
+			var right := Vector2i(current.x + 1, current.y)
+			if source_image.get_pixelv(right) == start_codel_color and not part_of_block.has(right) and not to_explore.has(right):
+				to_explore.append(right)
+
+		# left
+		if current.x - 1 >= 0:
+			var left := Vector2i(current.x - 1, current.y)
+			if source_image.get_pixelv(left) == start_codel_color and not part_of_block.has(left) and not to_explore.has(left):
+				to_explore.append(left)
+
+		# down
+		if current.y + 1 < source_image.get_height():
+			var down := Vector2i(current.x, current.y + 1)
+			if source_image.get_pixelv(down) == start_codel_color and not part_of_block.has(down) and not to_explore.has(down):
+				to_explore.append(down)
+
+		# up
+		if current.y - 1 >= 0:
+			var up := Vector2i(current.x, current.y - 1)
+			if source_image.get_pixelv(up) == start_codel_color and not part_of_block.has(up) and not to_explore.has(up):
+				to_explore.append(up)
+	
+	return part_of_block
+
+
+## Given the color block, uses the current dp_position, dp_direction and cc_direction to figure out the next codel.
+func get_next_codel_from_color_block(color_block: Array[Vector2i]) -> Vector2i:
+	var target_codel := dp_position
+
+	if dp_direction == DP_RIGHT:
+		# Find rightmost codel
+		for codel in color_block:
+			if codel.x >= target_codel.x:
+				target_codel = codel
+		
+		if cc_direction == CC_LEFT:
+			# Among rightmost, choose topmost
+			for codel in color_block:
+				if codel.x == target_codel.x and codel.y < target_codel.y:
+					target_codel = codel
+		elif cc_direction == CC_RIGHT:
+			# Among rightmost, choose bottommost
+			for codel in color_block:
+				if codel.x == target_codel.x and codel.y > target_codel.y:
+					target_codel = codel
+		
+		return target_codel + Vector2i(1, 0)
+
+	elif dp_direction == DP_LEFT:
+		# Find leftmost codel
+		for codel in color_block:
+			if codel.x <= target_codel.x:
+				target_codel = codel
+		
+		if cc_direction == CC_LEFT:
+			# Among leftmost, choose bottommost
+			for codel in color_block:
+				if codel.x == target_codel.x and codel.y > target_codel.y:
+					target_codel = codel
+		elif cc_direction == CC_RIGHT:
+			# Among leftmost, choose topmost
+			for codel in color_block:
+				if codel.x == target_codel.x and codel.y < target_codel.y:
+					target_codel = codel
+		
+		return target_codel + Vector2i(-1, 0)
+
+	elif dp_direction == DP_UP:
+		# Find topmost codel
+		for codel in color_block:
+			if codel.y <= target_codel.y:
+				target_codel = codel
+		
+		if cc_direction == CC_LEFT:
+			# Among topmost, choose leftmost
+			for codel in color_block:
+				if codel.y == target_codel.y and codel.x < target_codel.x:
+					target_codel = codel
+		elif cc_direction == CC_RIGHT:
+			# Among topmost, choose rightmost
+			for codel in color_block:
+				if codel.y == target_codel.y and codel.x > target_codel.x:
+					target_codel = codel
+		
+		return target_codel + Vector2i(0, -1)
+
+	elif dp_direction == DP_DOWN:
+		# Find bottommost codel
+		for codel in color_block:
+			if codel.y >= target_codel.y:
+				target_codel = codel
+		
+		if cc_direction == CC_LEFT:
+			# Among bottommost, choose rightmost
+			for codel in color_block:
+				if codel.y == target_codel.y and codel.x > target_codel.x:
+					target_codel = codel
+		elif cc_direction == CC_RIGHT:
+			# Among bottommost, choose leftmost
+			for codel in color_block:
+				if codel.y == target_codel.y and codel.x < target_codel.x:
+					target_codel = codel
+		
+		return target_codel + Vector2i(0, 1)
+	
+	return Vector2i(-1, -1) # Something went wrong
+
+
+## Pops the top two values off the stack, adds them, and pushes the result back on the stack.
+func piet_add() -> void:
+	stack.push(stack.pop() + stack.pop())
+	stack_updated.emit()
+
+
+## Pops the top two values off the stack, calculates the second top value minus the top value, and pushes the result back on the stack.
+func piet_substract() -> void:
+	var top_value := stack.pop()
+	var bottom_value := stack.pop()
+	stack.push(bottom_value - top_value)
+	stack_updated.emit()
+
+
+## Pops the top two values off the stack, multiplies them, and pushes the result back on the stack.
+func piet_multiply() -> void:
+	stack.push(stack.pop() * stack.pop())
+	stack_updated.emit()
+
+
+## Pops the top two values off the stack, calculates the integer division of the second top value by the top value, and pushes the result back on the stack.
+func piet_divide() -> void:
+	var top_value := stack.pop()
+	var bottom_value := stack.pop()
+	if bottom_value == 0:
+		return
+	
+	@warning_ignore("integer_division")
+	stack.push(bottom_value / top_value)
+	stack_updated.emit()
+
+
+## Pops the top two values off the stack, calculates the second top value modulo the top value, and pushes the result back on the stack. The result has the same sign as the divisor (the top value).
+func piet_mod() -> void:
+	var top_value := stack.pop()
+	var bottom_value := stack.pop()
+	if top_value == 0:
+		return
+	var value: int = posmod(bottom_value, top_value) * sign(top_value)
+	stack.push(value)
+	stack_updated.emit()
+
+
+##  Pops the top two values off the stack, and pushes 1 on to the stack if the second top value is greater than the top value, and pushes 0 if it is not greater.
+func piet_greater() -> void:
+	var top_value := stack.pop()
+	var bottom_value := stack.pop()
+	stack.push(bottom_value > top_value)
+
+
+## Pushes the value of the colour block just exited on to the stack.
+func piet_push(value: int) -> void:
+	stack.push(value)
+	stack_updated.emit()
+
+
+## Pops the top value off the stack and toggles the CC that many times (the absolute value of that many times if negative).
 func piet_switch() -> void:
-	if not stack.is_empty():
-		var value = stack.get(stack.size())
-		stack.remove_at(stack.size() - 1)
-		cc_direction = (cc_direction + abs(value)) % 2
+	var value = stack.pop()
+	cc_direction = (cc_direction + abs(value)) % 2
+
+
+## Pops the top value off the stack and rotates the DP clockwise that many steps (anticlockwise if negative).
+func piet_pointer() -> void:
+	var value := stack.pop()
+	dp_direction = posmod(dp_direction + value, 4)
+
+
+## Pushes a copy of the top value on the stack on to the stack.
+func piet_duplicate() -> void:
+	var value := stack.pop()
+	stack.push(value)
+	stack.push(value)
+	stack_updated.emit()
+
+
+## Pops the top value off the stack and discards it.
+func piet_pop() -> void:
+	stack.pop()
+
+
+## Pops the top two values off the stack and "rolls" the remaining stack entries to a depth equal to the second value popped, by a number of rolls equal to the first value popped. A single roll to depth n is defined as burying the top value on the stack n deep and bringing all values above it up by 1 place. A negative number of rolls rolls in the opposite direction.
+func piet_roll() -> void:
+	var roll_steps := stack.pop()
+	var roll_depth := stack.pop()
+	stack.roll(roll_depth, roll_steps)
+	stack_updated.emit()
+
+
+## Pops the top value off the stack and emits [signal char_outputed] with the value as single character string argument.
+func piet_out_char() -> void:
+	var char_string := char(stack.pop())
+	outputed.emit(char_string)
+	stack_updated.emit()
+
+
+## Pops the top value off the stack and emits [signal outputed] with a string representation of the value as argument.
+func piet_out_number() -> void:
+	var number_string := str(stack.pop())
+	outputed.emit(number_string)
+	stack_updated.emit()
