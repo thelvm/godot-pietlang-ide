@@ -1,5 +1,6 @@
-[gd_scene load_steps=8 format=3 uid="uid://bxrxbs3158s50"]
+[gd_scene load_steps=11 format=3 uid="uid://bxrxbs3158s50"]
 
+[ext_resource type="Theme" uid="uid://b1w65fnqfb7st" path="res://mondrian.tres" id="1_5vw27"]
 [ext_resource type="Script" uid="uid://y7ami2ldov1m" path="res://main.gd" id="1_ig7tw"]
 [ext_resource type="Script" uid="uid://cds82uvwogchw" path="res://pietlang_interpreter.gd" id="2_0xm2m"]
 [ext_resource type="Texture2D" uid="uid://buukcn6qwoew0" path="res://right-arrow.png" id="2_1bvp3"]
@@ -7,6 +8,29 @@
 [ext_resource type="Script" uid="uid://bd7pgpf2yo7h" path="res://last_instruction_label.gd" id="4_lquwl"]
 [ext_resource type="Script" uid="uid://tg374t8mge4w" path="res://stack_visualizer.gd" id="5_7mycd"]
 [ext_resource type="Script" uid="uid://ch0c2fpvtng6q" path="res://output_label.gd" id="6_272bh"]
+
+[sub_resource type="GDScript" id="GDScript_kek77"]
+resource_name = "ImportSourceImageButton"
+script/source = "extends Button
+
+@onready var pietlang_interpreter: PietlangInterpreter = %PietlangInterpreter
+
+
+func _on_pietlang_interpreter_source_image_set() -> void:
+	visible = false
+"
+
+[sub_resource type="GDScript" id="GDScript_5vw27"]
+resource_name = "SourceCodeImage"
+script/source = "extends TextureRect
+
+@onready var pietlang_interpreter: PietlangInterpreter = %PietlangInterpreter
+
+
+func _on_pietlang_interpreter_source_image_set() -> void:
+	texture = ImageTexture.create_from_image(pietlang_interpreter.source_image)
+	visible = true
+"
 
 [node name="Main" type="Control"]
 layout_mode = 3
@@ -17,9 +41,10 @@ grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
+theme = ExtResource("1_5vw27")
 script = ExtResource("1_ig7tw")
 
-[node name="GridContainer" type="VBoxContainer" parent="."]
+[node name="PanelContainer" type="PanelContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -27,79 +52,135 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="HBoxContainer" type="HBoxContainer" parent="GridContainer"]
+[node name="GridContainer" type="VSplitContainer" parent="PanelContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/GridContainer"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="CodeImage" type="TextureRect" parent="GridContainer/HBoxContainer"]
+[node name="ProgramControl" type="VBoxContainer" parent="PanelContainer/GridContainer/HBoxContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="ImportSourceImageButton" type="Button" parent="PanelContainer/GridContainer/HBoxContainer/ProgramControl"]
+layout_mode = 2
+size_flags_vertical = 4
+text = "Import Image"
+script = SubResource("GDScript_kek77")
+
+[node name="StepButton" type="Button" parent="PanelContainer/GridContainer/HBoxContainer/ProgramControl"]
+layout_mode = 2
+size_flags_vertical = 4
+text = "Step"
+
+[node name="VSeparator2" type="VSeparator" parent="PanelContainer/GridContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="HSplitContainer" type="HSplitContainer" parent="PanelContainer/GridContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="SourceCodeElements" type="MarginContainer" parent="PanelContainer/GridContainer/HBoxContainer/HSplitContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="SourceCodeImage" type="TextureRect" parent="PanelContainer/GridContainer/HBoxContainer/HSplitContainer/SourceCodeElements"]
 unique_name_in_owner = true
+visible = false
 texture_filter = 1
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 expand_mode = 1
 stretch_mode = 5
+script = SubResource("GDScript_5vw27")
 
-[node name="DpImage" type="Sprite2D" parent="GridContainer/HBoxContainer/CodeImage"]
+[node name="DpImage" type="Sprite2D" parent="PanelContainer/GridContainer/HBoxContainer/HSplitContainer/SourceCodeElements/SourceCodeImage"]
 texture = ExtResource("2_1bvp3")
 script = ExtResource("3_lquwl")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="GridContainer/HBoxContainer"]
+[node name="RuntimeVariables" type="VBoxContainer" parent="PanelContainer/GridContainer/HBoxContainer/HSplitContainer"]
 layout_mode = 2
 
-[node name="ImportSourceImageButton" type="Button" parent="GridContainer/HBoxContainer/VBoxContainer"]
+[node name="PanelContainer2" type="PanelContainer" parent="PanelContainer/GridContainer/HBoxContainer/HSplitContainer/RuntimeVariables"]
 layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
-text = "Import Image"
+theme_type_variation = &"BluePanelContainer"
 
-[node name="ScrollContainer" type="ScrollContainer" parent="GridContainer/HBoxContainer/VBoxContainer"]
-layout_mode = 2
-size_flags_vertical = 3
-horizontal_scroll_mode = 0
-
-[node name="StackVisualizer" type="VBoxContainer" parent="GridContainer/HBoxContainer/VBoxContainer/ScrollContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-script = ExtResource("5_7mycd")
-
-[node name="VBoxContainer" type="VBoxContainer" parent="GridContainer"]
+[node name="MarginContainer2" type="MarginContainer" parent="PanelContainer/GridContainer/HBoxContainer/HSplitContainer/RuntimeVariables/PanelContainer2"]
 layout_mode = 2
 
-[node name="StepButton" type="Button" parent="GridContainer/VBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
-text = "Step"
-
-[node name="HBoxContainer" type="HBoxContainer" parent="GridContainer/VBoxContainer"]
-layout_mode = 2
-
-[node name="Label" type="Label" parent="GridContainer/VBoxContainer/HBoxContainer"]
-layout_mode = 2
-text = "Last instruction: "
-
-[node name="LastInstructionLabel" type="Label" parent="GridContainer/VBoxContainer/HBoxContainer"]
+[node name="LastInstructionLabel" type="Label" parent="PanelContainer/GridContainer/HBoxContainer/HSplitContainer/RuntimeVariables/PanelContainer2/MarginContainer2"]
 layout_mode = 2
 text = "INSTRUCTION"
 horizontal_alignment = 1
 script = ExtResource("4_lquwl")
 
-[node name="HBoxContainer2" type="HBoxContainer" parent="GridContainer/VBoxContainer"]
+[node name="HSeparator2" type="HSeparator" parent="PanelContainer/GridContainer/HBoxContainer/HSplitContainer/RuntimeVariables"]
 layout_mode = 2
 
-[node name="Label2" type="Label" parent="GridContainer/VBoxContainer/HBoxContainer2"]
+[node name="PanelContainer" type="PanelContainer" parent="PanelContainer/GridContainer/HBoxContainer/HSplitContainer/RuntimeVariables"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_type_variation = &"YellowPanelContainer"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="PanelContainer/GridContainer/HBoxContainer/HSplitContainer/RuntimeVariables/PanelContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="StackVisualizer" type="VBoxContainer" parent="PanelContainer/GridContainer/HBoxContainer/HSplitContainer/RuntimeVariables/PanelContainer/ScrollContainer"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+alignment = 2
+script = ExtResource("5_7mycd")
+
+[node name="HSeparator" type="HSeparator" parent="PanelContainer/GridContainer/HBoxContainer/HSplitContainer/RuntimeVariables"]
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer/GridContainer/HBoxContainer/HSplitContainer/RuntimeVariables"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="PanelContainer/GridContainer/HBoxContainer/HSplitContainer/RuntimeVariables/MarginContainer"]
+layout_mode = 2
+text = "Stack"
+horizontal_alignment = 1
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="PanelContainer/GridContainer"]
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer/GridContainer/HBoxContainer2"]
+layout_mode = 2
+
+[node name="Label2" type="Label" parent="PanelContainer/GridContainer/HBoxContainer2/MarginContainer"]
 layout_mode = 2
 size_flags_horizontal = 8
-text = "Output:"
+text = "Output"
 
-[node name="OutputLabel" type="Label" parent="GridContainer/VBoxContainer/HBoxContainer2"]
+[node name="VSeparator" type="VSeparator" parent="PanelContainer/GridContainer/HBoxContainer2"]
 layout_mode = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="PanelContainer/GridContainer/HBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"RedPanelContainer"
+
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer/GridContainer/HBoxContainer2/PanelContainer"]
+layout_mode = 2
+
+[node name="OutputLabel" type="Label" parent="PanelContainer/GridContainer/HBoxContainer2/PanelContainer/MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
 script = ExtResource("6_272bh")
 
 [node name="PietlangInterpreter" type="Node" parent="."]
 unique_name_in_owner = true
 script = ExtResource("2_0xm2m")
 
-[connection signal="pressed" from="GridContainer/HBoxContainer/VBoxContainer/ImportSourceImageButton" to="." method="_on_import_source_image_button_pressed"]
-[connection signal="pressed" from="GridContainer/VBoxContainer/StepButton" to="PietlangInterpreter" method="step"]
+[connection signal="pressed" from="PanelContainer/GridContainer/HBoxContainer/ProgramControl/ImportSourceImageButton" to="." method="_on_import_source_image_button_pressed"]
+[connection signal="pressed" from="PanelContainer/GridContainer/HBoxContainer/ProgramControl/StepButton" to="PietlangInterpreter" method="step"]
+[connection signal="source_image_set" from="PietlangInterpreter" to="PanelContainer/GridContainer/HBoxContainer/HSplitContainer/SourceCodeElements/SourceCodeImage" method="_on_pietlang_interpreter_source_image_set"]
+[connection signal="source_image_set" from="PietlangInterpreter" to="PanelContainer/GridContainer/HBoxContainer/ProgramControl/ImportSourceImageButton" method="_on_pietlang_interpreter_source_image_set"]

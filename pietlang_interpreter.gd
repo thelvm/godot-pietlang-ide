@@ -1,9 +1,14 @@
 class_name PietlangInterpreter
 extends Node
 
+## Emitted when the source image image is set or replaced.
+signal source_image_set
+## Emitted when an instruction has finished exucuting.
 signal executed_instruction(instruction: StringName)
+## Effectively acts like an stdout stream.
 signal outputed(value: String)
-signal stack_updated()
+## Emitted when the stack has been modified in any way.
+signal stack_updated
 
 const DP_RIGHT = 0
 const DP_DOWN = 1
@@ -70,14 +75,20 @@ const INSTRUCTIONS: Dictionary[Array, StringName] = {
 	[5, 2]: &"out_char",
 }
 
-var source_image: Image
+## The "source code", but as an image, because this is Piet.
+var source_image: Image: set = _set_source_image
 
-var stack: Stack = Stack.new()
+var stack: Stack
 var dp_direction: int = DP_RIGHT
 var cc_direction: int = CC_LEFT
 var dp_position: Vector2i = Vector2i(0, 0)
 
 
+func _ready() -> void:
+	stack = Stack.new()
+
+
+## Steps through the program using the current Direction Pointer location and direction and the Codel Chooser direction.
 func step() -> void:
 	var previous_color := source_image.get_pixelv(dp_position)
 	var color_block := get_color_block(dp_position, previous_color)
@@ -136,6 +147,7 @@ func step() -> void:
 	executed_instruction.emit(instruction)
 
 
+## Translates the difference between two colors into a Pier instruction.
 static func get_instruction(previous_color: Color, current_color: Color) -> StringName:
 	var previous_pietcolor := color_to_pietcolor(previous_color)
 	var current_pietcolor := color_to_pietcolor(current_color)
@@ -145,9 +157,9 @@ static func get_instruction(previous_color: Color, current_color: Color) -> Stri
 		return INSTRUCTIONS.get([hue_diff, light_diff], &"Unknown instruction")
 	else:
 		return &"Unknown instruction"
-	
 
 
+## Maps a color to one of the 20 defined Pier colors. Only maps correctly if the color is exactly the right value. Colors outside the range of the defined colors are returned as [code []].
 static func color_to_pietcolor(color: Color) -> PackedInt32Array:
 	var piet_color: PackedInt32Array = PIET_COLORS.get(color.to_html(false), [])
 	return piet_color
@@ -373,3 +385,8 @@ func piet_out_number() -> void:
 	var number_string := str(stack.pop())
 	outputed.emit(number_string)
 	stack_updated.emit()
+
+
+func _set_source_image(new_image: Image) -> void:
+	source_image = new_image
+	source_image_set.emit()
