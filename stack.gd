@@ -5,8 +5,8 @@ var _stack: PackedInt64Array
 
 
 ## Initializes an empty stack
-func _init() -> void:
-	_stack = PackedInt64Array()
+func _init(source_array := PackedInt64Array()) -> void:
+	_stack = source_array
 
 
 ## Removes the top element of the stack and returns it.

@@ -83,13 +83,23 @@ var dp_direction: int = DP_RIGHT
 var cc_direction: int = CC_LEFT
 var dp_position: Vector2i = Vector2i(0, 0)
 
+var current_step: int = 0
+var last_executed_instruction: StringName = &"noop"
+var state_history: Array[InterpreterState]
+
 
 func _ready() -> void:
 	stack = Stack.new()
+	state_history.append(InterpreterState.new())
 
 
 ## Steps through the program using the current Direction Pointer location and direction and the Codel Chooser direction.
 func step() -> void:
+	current_step += 1
+	if state_history.size() > current_step:
+		load_from_state_history(current_step)
+		return
+	
 	var previous_color := source_image.get_pixelv(dp_position)
 	var color_block := get_color_block(dp_position, previous_color)
 	
@@ -144,7 +154,17 @@ func step() -> void:
 		&"out_number":
 			piet_out_number()
 	
-	executed_instruction.emit(instruction)
+	last_executed_instruction = instruction
+	_increment_state_history()
+	executed_instruction.emit(last_executed_instruction)
+
+
+## Goes back one step in the state history.
+func step_back() -> void:
+	if current_step <= 0:
+		return
+	current_step -= 1
+	load_from_state_history(current_step)
 
 
 ## Translates the difference between two colors into a Pier instruction.
@@ -390,3 +410,27 @@ func piet_out_number() -> void:
 func _set_source_image(new_image: Image) -> void:
 	source_image = new_image
 	source_image_set.emit()
+
+
+## Appends the current state to the history. 
+func _increment_state_history() -> void:
+	var state := InterpreterState.new()
+	state.stack = stack.as_array()
+	state.dp_position = dp_position
+	state.dp_direction = dp_direction
+	state.cc_direction = cc_direction
+	state.last_executed_instruction = last_executed_instruction
+	
+	state_history.append(state)
+
+
+## Loads a state from the state history and replaces the current one.
+func load_from_state_history(step_index: int) -> void:
+	var state := state_history[step_index]
+	stack = Stack.new(state.stack)
+	dp_direction = state.dp_direction
+	dp_position = state.dp_position
+	cc_direction = state.cc_direction
+	last_executed_instruction = state.last_executed_instruction
+	stack_updated.emit()
+	executed_instruction.emit(last_executed_instruction)
