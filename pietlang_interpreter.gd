@@ -3,12 +3,14 @@ extends Node
 
 ## Emitted when the source image image is set or replaced.
 signal source_image_set
-## Emitted when an instruction has finished exucuting.
+## Emitted when an instruction has finished executing.
 signal executed_instruction(instruction: StringName)
 ## Effectively acts like an stdout stream.
 signal outputed(value: String)
 ## Emitted when the stack has been modified in any way.
 signal stack_updated
+## Emitted when the state of the interpreter changes in any way.
+signal state_updated
 
 const DP_RIGHT = 0
 const DP_DOWN = 1
@@ -91,6 +93,7 @@ var state_history: Array[InterpreterState]
 func _ready() -> void:
 	stack = Stack.new()
 	state_history.append(InterpreterState.new())
+	state_updated.emit()
 
 
 ## Steps through the program using the current Direction Pointer location and direction and the Codel Chooser direction.
@@ -157,6 +160,7 @@ func step() -> void:
 	last_executed_instruction = instruction
 	_increment_state_history()
 	executed_instruction.emit(last_executed_instruction)
+	state_updated.emit()
 
 
 ## Goes back one step in the state history.
@@ -410,6 +414,7 @@ func piet_out_number() -> void:
 func _set_source_image(new_image: Image) -> void:
 	source_image = new_image
 	source_image_set.emit()
+	state_updated.emit()
 
 
 ## Appends the current state to the history. 
@@ -433,4 +438,5 @@ func load_from_state_history(step_index: int) -> void:
 	cc_direction = state.cc_direction
 	last_executed_instruction = state.last_executed_instruction
 	stack_updated.emit()
+	state_updated.emit()
 	executed_instruction.emit(last_executed_instruction)

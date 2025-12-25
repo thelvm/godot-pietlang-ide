@@ -1,40 +1,16 @@
 extends Sprite2D
 
 @onready var pietlang_interpreter: PietlangInterpreter = %PietlangInterpreter
-@onready var source_code_image: TextureRect = %SourceCodeImage
+@onready var source_code_image: SourceCodeTextureRect = %SourceCodeImage
 
 
-func _process(_delta: float) -> void:
+func _update() -> void:
 	if source_code_image.texture:
 		visible = true
-		var code_texture_aspect_ratio := float(source_code_image.texture.get_width()) / float(source_code_image.texture.get_height())
-		var code_image_control_aspect_ratio := source_code_image.size[0] / source_code_image.size[1]
-		var image_scale: float
-		if code_texture_aspect_ratio > code_image_control_aspect_ratio:
-			# If the texture will be resized by fitting it's width
-			image_scale = source_code_image.size[0] / float(source_code_image.texture.get_width())
-		else:
-			# If the texture will be resized by fitting it's height
-			image_scale = source_code_image.size[1] / float(source_code_image.texture.get_height())
+		position = source_code_image.pixel_position_to_local_position(pietlang_interpreter.dp_position)
 		
-		var image_size_on_screen = source_code_image.texture.get_size() * image_scale
-		var codel_size_on_screen := Vector2()
-		codel_size_on_screen.x = image_size_on_screen.x / float(source_code_image.texture.get_width())
-		codel_size_on_screen.y = image_size_on_screen.y / float(source_code_image.texture.get_height())
-		
-		scale.x = codel_size_on_screen.x / texture.get_width()
-		scale.y = codel_size_on_screen.y / texture.get_height()
-		
-		position.x = pietlang_interpreter.dp_position.x * codel_size_on_screen.x
-		position.y = pietlang_interpreter.dp_position.y * codel_size_on_screen.y
-		
-		# Offset so it's relative to the center of the code image
-		position.x += (source_code_image.size.x / 2) - image_size_on_screen.x / 2
-		position.y += (source_code_image.size.y / 2) - image_size_on_screen.y / 2
-		
-		# Offset so it's in the middle of the codel
-		position.x += codel_size_on_screen.x / 2
-		position.y += codel_size_on_screen.y / 2
+		scale.x = source_code_image.codel_size_on_screen.x / texture.get_size().x
+		scale.y = source_code_image.codel_size_on_screen.y / texture.get_size().y
 		
 		match pietlang_interpreter.dp_direction:
 			PietlangInterpreter.DP_RIGHT:
@@ -50,6 +26,5 @@ func _process(_delta: float) -> void:
 				flip_v = false
 			PietlangInterpreter.CC_RIGHT:
 				flip_v = true
-		
 	else:
 		visible = 0
