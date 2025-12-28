@@ -4,6 +4,7 @@
 [ext_resource type="Script" uid="uid://y7ami2ldov1m" path="res://main.gd" id="1_ig7tw"]
 [ext_resource type="Script" uid="uid://cds82uvwogchw" path="res://pietlang_interpreter.gd" id="2_0xm2m"]
 [ext_resource type="Texture2D" uid="uid://buukcn6qwoew0" path="res://right-arrow.png" id="2_1bvp3"]
+[ext_resource type="Script" uid="uid://cm8r7reiih038" path="res://current_step_spin_box.gd" id="3_efxa6"]
 [ext_resource type="Script" uid="uid://tphixnkitd24" path="res://source_code_texture_rect.gd" id="3_kek77"]
 [ext_resource type="Script" uid="uid://cabqtn5b0kawc" path="res://dp_image.gd" id="3_lquwl"]
 [ext_resource type="Script" uid="uid://bd7pgpf2yo7h" path="res://last_instruction_label.gd" id="4_lquwl"]
@@ -64,6 +65,13 @@ layout_mode = 2
 size_flags_vertical = 4
 text = "Step"
 
+[node name="CurrentStepSpinBox" type="SpinBox" parent="PanelContainer/GridContainer/HBoxContainer/ProgramControl" unique_id=1343669012]
+layout_mode = 2
+rounded = true
+alignment = 1
+prefix = "Step"
+script = ExtResource("3_efxa6")
+
 [node name="StepBackButton" type="Button" parent="PanelContainer/GridContainer/HBoxContainer/ProgramControl" unique_id=539290334]
 layout_mode = 2
 size_flags_vertical = 4
@@ -97,6 +105,9 @@ script = ExtResource("3_lquwl")
 
 [node name="ExecutionPath" type="Line2D" parent="PanelContainer/GridContainer/HBoxContainer/HSplitContainer/SourceCodeElements/SourceCodeImage" unique_id=1642781427]
 default_color = Color(0.46618086, 0.4661808, 0.4661808, 1)
+joint_mode = 2
+begin_cap_mode = 2
+end_cap_mode = 2
 antialiased = true
 script = ExtResource("6_4c57u")
 
@@ -182,9 +193,11 @@ script = ExtResource("2_0xm2m")
 
 [connection signal="pressed" from="PanelContainer/GridContainer/HBoxContainer/ProgramControl/ImportSourceImageButton" to="." method="_on_import_source_image_button_pressed"]
 [connection signal="pressed" from="PanelContainer/GridContainer/HBoxContainer/ProgramControl/StepButton" to="PietlangInterpreter" method="step"]
+[connection signal="value_changed" from="PanelContainer/GridContainer/HBoxContainer/ProgramControl/CurrentStepSpinBox" to="PanelContainer/GridContainer/HBoxContainer/ProgramControl/CurrentStepSpinBox" method="_on_value_changed"]
 [connection signal="pressed" from="PanelContainer/GridContainer/HBoxContainer/ProgramControl/StepBackButton" to="PietlangInterpreter" method="step_back"]
 [connection signal="resized" from="PanelContainer/GridContainer/HBoxContainer/HSplitContainer/SourceCodeElements/SourceCodeImage" to="PanelContainer/GridContainer/HBoxContainer/HSplitContainer/SourceCodeElements/SourceCodeImage" method="_on_resized"]
 [connection signal="source_image_set" from="PietlangInterpreter" to="PanelContainer/GridContainer/HBoxContainer/ProgramControl/ImportSourceImageButton" method="_on_pietlang_interpreter_source_image_set"]
 [connection signal="source_image_set" from="PietlangInterpreter" to="PanelContainer/GridContainer/HBoxContainer/HSplitContainer/SourceCodeElements/SourceCodeImage" method="_on_pietlang_interpreter_source_image_set"]
 [connection signal="state_updated" from="PietlangInterpreter" to="PanelContainer/GridContainer/HBoxContainer/HSplitContainer/SourceCodeElements/SourceCodeImage/DpImage" method="_update"]
 [connection signal="state_updated" from="PietlangInterpreter" to="PanelContainer/GridContainer/HBoxContainer/HSplitContainer/SourceCodeElements/SourceCodeImage/ExecutionPath" method="_on_pietlang_interpreter_state_updated"]
+[connection signal="state_updated" from="PietlangInterpreter" to="PanelContainer/GridContainer/HBoxContainer/ProgramControl/CurrentStepSpinBox" method="_on_pietlang_interpreter_state_updated"]

@@ -42,11 +42,29 @@ grow_begin = 0.0
 grow_end = 0.0
 thickness = 10
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mhcxn"]
+bg_color = Color(0.8879926, 0.88799256, 0.8879925, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2466e"]
+bg_color = Color(0.8879926, 0.88799256, 0.8879925, 1)
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6n2q3"]
 bg_color = Color(0.8879926, 0.88799256, 0.8879925, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_oovds"]
 bg_color = Color(0.8362234, 0.17627174, 0.114561684, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lf6wr"]
+bg_color = Color(0.08701605, 0.08701607, 0.08701605, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_enxct"]
+bg_color = Color(0.8879926, 0.88799256, 0.8879925, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_gysp3"]
+bg_color = Color(0.08701605, 0.08701607, 0.08701605, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tj7gb"]
+bg_color = Color(0.8879926, 0.88799256, 0.8879925, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2b85r"]
 bg_color = Color(0.08701605, 0.08701607, 0.08701605, 1)
@@ -81,6 +99,12 @@ HBoxContainer/constants/separation = 0
 HSeparator/constants/separation = 10
 HSeparator/styles/separator = SubResource("StyleBoxLine_6n2q3")
 Label/colors/font_color = Color(0.08701605, 0.08701607, 0.08701605, 1)
+LineEdit/colors/caret_color = Color(0.08701605, 0.08701607, 0.08701605, 1)
+LineEdit/colors/font_color = Color(0.08701605, 0.08701607, 0.08701605, 1)
+LineEdit/colors/font_selected_color = Color(0.8879926, 0.88799256, 0.8879925, 1)
+LineEdit/colors/selection_color = Color(0.08701605, 0.08701607, 0.08701605, 1)
+LineEdit/styles/focus = SubResource("StyleBoxFlat_mhcxn")
+LineEdit/styles/normal = SubResource("StyleBoxFlat_2466e")
 MarginContainer/constants/margin_bottom = 10
 MarginContainer/constants/margin_left = 10
 MarginContainer/constants/margin_right = 10
@@ -88,6 +112,21 @@ MarginContainer/constants/margin_top = 10
 PanelContainer/styles/panel = SubResource("StyleBoxFlat_6n2q3")
 RedPanelContainer/base_type = &"PanelContainer"
 RedPanelContainer/styles/panel = SubResource("StyleBoxFlat_oovds")
+SpinBox/colors/down_disabled_icon_modulate = Color(0.87692463, 0.87692463, 0.87692463, 0)
+SpinBox/colors/down_hover_icon_modulate = Color(0.8879926, 0.88799256, 0.8879925, 1)
+SpinBox/colors/down_icon_modulate = Color(0.8862745, 0.8862745, 0.8862745, 1)
+SpinBox/colors/down_pressed_icon_modulate = Color(0.08701605, 0.08701607, 0.08701605, 1)
+SpinBox/colors/up_disabled_icon_modulate = Color(0.87692463, 0.87692463, 0.87692463, 0)
+SpinBox/colors/up_hover_icon_modulate = Color(0.8862745, 0.8862745, 0.8862745, 1)
+SpinBox/colors/up_icon_modulate = Color(0.8862745, 0.8862745, 0.8862745, 1)
+SpinBox/colors/up_pressed_icon_modulate = Color(0.08701605, 0.08701607, 0.08701605, 1)
+SpinBox/constants/field_and_buttons_separation = 0
+SpinBox/styles/down_background = SubResource("StyleBoxFlat_lf6wr")
+SpinBox/styles/down_background_hovered = SubResource("StyleBoxFlat_lf6wr")
+SpinBox/styles/down_background_pressed = SubResource("StyleBoxFlat_enxct")
+SpinBox/styles/up_background = SubResource("StyleBoxFlat_gysp3")
+SpinBox/styles/up_background_hovered = SubResource("StyleBoxFlat_tj7gb")
+SpinBox/styles/up_background_pressed = SubResource("StyleBoxFlat_tj7gb")
 SplitContainer/constants/minimum_grab_thickness = 10
 SplitContainer/constants/separation = 10
 SplitContainer/styles/split_bar_background = SubResource("StyleBoxFlat_2b85r")

@@ -86,6 +86,8 @@ var cc_direction: int = CC_LEFT
 var dp_position: Vector2i = Vector2i(0, 0)
 
 var current_step: int = 0
+## The last step of the program execution. -1 if unknown. 
+var last_step: int = -1
 var last_executed_instruction: StringName = &"noop"
 var state_history: Array[InterpreterState]
 
@@ -99,28 +101,43 @@ func _ready() -> void:
 ## Steps through the program using the current Direction Pointer location and direction and the Codel Chooser direction.
 func step() -> void:
 	current_step += 1
+	# If the last step has been determined and we're trying to step byond it.
+	if last_step != -1 and current_step > last_step:
+		# Bypass the step and keep the counter at last_step.
+		current_step = last_step
+		return
+	
+	# Load step from the state history if it's a step we already computed.
+	#TODO invalidate step history on picture change
 	if state_history.size() > current_step:
 		load_from_state_history(current_step)
 		return
 	
+	#TODO make ColorBlock class to hold all the information about a color block.
 	var previous_color := source_image.get_pixelv(dp_position)
 	var color_block := get_color_block(dp_position, previous_color)
 	
 	var valid_next_position := false
 	var rotations := 0
 	while not valid_next_position:
+		# Iterate through all 8 posible code block exits.
 		var potential_position := get_next_codel_from_color_block(color_block)
+		
 		if potential_position.x < source_image.get_width() and 0 <= potential_position.x and potential_position.y < source_image.get_height() and 0 <= potential_position.y and source_image.get_pixelv(potential_position) != Color.BLACK:
+			# If not out of bounds or black.
 			valid_next_position = true
 			dp_position = potential_position
 		else:
+			# Aternates between switching the Codel Chooser and Rotating the Codel Pointer.
 			if rotations % 2 == 0:
 				cc_direction = (cc_direction + 1) % 2
 			if rotations % 2 == 1:
 				dp_direction = (dp_direction + 1) % 4
 			rotations += 1
+			# Until we have tested all possible exits, in which case the program is over.
 			if rotations >= 8:
-				push_warning("Stuck")
+				print("Program ended.")
+				last_step = current_step
 				return
 	
 	var instruction := get_instruction(previous_color, source_image.get_pixelv(dp_position))
@@ -169,6 +186,14 @@ func step_back() -> void:
 		return
 	current_step -= 1
 	load_from_state_history(current_step)
+
+
+## Tries to execute the entire program, caching every step in history. Stops early if more than max_steps are necessary to end the program.
+func traverse(max_steps: int = 1000, seek_to_start: bool = true):
+	while last_step == -1 and current_step <= max_steps:
+		step()
+	if seek_to_start:
+		load_from_state_history(0)
 
 
 ## Translates the difference between two colors into a Pier instruction.
@@ -437,6 +462,7 @@ func load_from_state_history(step_index: int) -> void:
 	dp_position = state.dp_position
 	cc_direction = state.cc_direction
 	last_executed_instruction = state.last_executed_instruction
+	current_step = step_index
 	stack_updated.emit()
 	state_updated.emit()
 	executed_instruction.emit(last_executed_instruction)

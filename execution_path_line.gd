@@ -5,7 +5,7 @@ extends Line2D
 
 
 func _on_pietlang_interpreter_state_updated() -> void:
-	width = minf(1.0, source_code_image.codel_size_on_screen.x / 10.0)
+	width = minf(10.0, source_code_image.codel_size_on_screen.x / 10.0)
 	_update_points()
 
 

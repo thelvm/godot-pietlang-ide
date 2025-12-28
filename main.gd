@@ -20,3 +20,4 @@ func _on_file_selected(file_path: String) -> void:
 	file_dialog.queue_free()
 	var image := Image.load_from_file(file_path)
 	pietlang_interpreter.source_image = image
+	pietlang_interpreter.traverse()
