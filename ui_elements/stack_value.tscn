@@ -1,6 +1,6 @@
-[gd_scene load_steps=2 format=3 uid="uid://dwo7tni0hgoy"]
+[gd_scene format=3 uid="uid://dwo7tni0hgoy"]
 
-[ext_resource type="Script" uid="uid://dm2w25fi0h3hs" path="res://stack_value_ui.gd" id="1_o00s5"]
+[ext_resource type="Script" uid="uid://dm2w25fi0h3hs" path="res://scripts/stack_value_ui.gd" id="1_o00s5"]
 
 [node name="StackValueUi" type="PanelContainer"]
 offset_right = 11.0

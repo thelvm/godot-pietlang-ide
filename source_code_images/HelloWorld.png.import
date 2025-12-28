@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://buukcn6qwoew0"
-path="res://.godot/imported/right-arrow.png-c31fee20c8401d6e7c27b57f94443087.ctex"
+uid="uid://bubynok65ad37"
+path="res://.godot/imported/HelloWorld.png-cba00667603928ee8805637713b9d67e.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://right-arrow.png"
-dest_files=["res://.godot/imported/right-arrow.png-c31fee20c8401d6e7c27b57f94443087.ctex"]
+source_file="res://source_code_images/HelloWorld.png"
+dest_files=["res://.godot/imported/HelloWorld.png-cba00667603928ee8805637713b9d67e.ctex"]
 
 [params]
 

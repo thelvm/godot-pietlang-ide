@@ -3,12 +3,12 @@
 importer="font_data_dynamic"
 type="FontFile"
 uid="uid://8j2k880bceg1"
-path="res://.godot/imported/PermanentMarker-Regular.ttf-87bd317b0d808ebd3200d2037e35c6b6.fontdata"
+path="res://.godot/imported/PermanentMarker-Regular.ttf-c5f652ac7530d62ae72f5812a84fd58b.fontdata"
 
 [deps]
 
-source_file="res://PermanentMarker-Regular.ttf"
-dest_files=["res://.godot/imported/PermanentMarker-Regular.ttf-87bd317b0d808ebd3200d2037e35c6b6.fontdata"]
+source_file="res://fonts/PermanentMarker-Regular.ttf"
+dest_files=["res://.godot/imported/PermanentMarker-Regular.ttf-c5f652ac7530d62ae72f5812a84fd58b.fontdata"]
 
 [params]
 

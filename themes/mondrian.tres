@@ -1,7 +1,7 @@
 [gd_resource type="Theme" format=3 uid="uid://b1w65fnqfb7st"]
 
-[ext_resource type="FontFile" uid="uid://8j2k880bceg1" path="res://PermanentMarker-Regular.ttf" id="1_oovds"]
-[ext_resource type="FontFile" uid="uid://babwl07062cvo" path="res://JetBrainsMono[wght].ttf" id="1_p25dl"]
+[ext_resource type="FontFile" uid="uid://8j2k880bceg1" path="res://fonts/PermanentMarker-Regular.ttf" id="1_oovds"]
+[ext_resource type="FontFile" uid="uid://babwl07062cvo" path="res://fonts/JetBrainsMono[wght].ttf" id="1_p25dl"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_cvg6l"]
 bg_color = Color(0, 0.36772662, 0.798937, 1)

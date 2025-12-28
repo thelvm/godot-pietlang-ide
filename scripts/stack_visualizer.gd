@@ -13,6 +13,6 @@ func _on_pietlang_interpreter_stack_updated() -> void:
 		child.queue_free()
 	
 	for i in range(int_stack.size() - 1, -1, -1):
-		var stack_value_ui := preload("res://stack_value.tscn").instantiate() as StackValueUi
+		var stack_value_ui := preload("uid://dwo7tni0hgoy").instantiate() as StackValueUi
 		stack_value_ui.value = int_stack[i]
 		add_child(stack_value_ui)
