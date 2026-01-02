@@ -79,6 +79,8 @@ const INSTRUCTIONS: Dictionary[Array, StringName] = {
 
 ## The "source code", but as an image, because this is Piet.
 var source_image: Image: set = _set_source_image
+## Size, in pixels, of each codel. This allows using scaled images as source code.
+var codel_size: int = 1
 
 var stack: Stack
 var dp_direction: int = DP_RIGHT
@@ -114,8 +116,8 @@ func step() -> void:
 		return
 	
 	#TODO make ColorBlock class to hold all the information about a color block.
-	var previous_color := source_image.get_pixelv(dp_position)
-	var color_block := get_color_block(dp_position, previous_color)
+	var previous_color := source_image.get_pixelv(dp_position * codel_size)
+	var color_block := get_color_block(dp_position * codel_size, previous_color)
 	
 	var valid_next_position := false
 	var rotations := 0
@@ -189,11 +191,20 @@ func step_back() -> void:
 
 
 ## Tries to execute the entire program, caching every step in history. Stops early if more than max_steps are necessary to end the program.
-func traverse(max_steps: int = 1000, seek_to_start: bool = true):
+func traverse(max_steps: int = 1000, seek_to_start: bool = true) -> void:
+	reset_history()
+	current_step = 0
+	stack = Stack.new()
 	while last_step == -1 and current_step <= max_steps:
 		step()
+		print(current_step)
 	if seek_to_start:
 		load_from_state_history(0)
+
+
+func reset_history() -> void:
+	state_history = []
+	state_history.append(InterpreterState.new())
 
 
 ## Translates the difference between two colors into a Pier instruction.
@@ -216,6 +227,7 @@ static func color_to_pietcolor(color: Color) -> PackedInt32Array:
 
 ## Returns all the codels belonging to the color block of which start_codel is a part of.
 func get_color_block(start_codel: Vector2i, start_codel_color: Color) -> Array[Vector2i]:
+	# TODO Handle white
 	var to_explore: Array[Vector2i] = [start_codel]
 	var part_of_block: Array[Vector2i] = []
 	
