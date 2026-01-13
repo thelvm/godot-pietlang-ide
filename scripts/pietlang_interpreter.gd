@@ -108,7 +108,6 @@ func step() -> void:
 		# Bypass the step and keep the counter at last_step.
 		current_step = last_step
 		return
-	
 	# Load step from the state history if it's a step we already computed.
 	#TODO invalidate step history on picture change
 	if state_history.size() > current_step:
@@ -197,7 +196,6 @@ func traverse(max_steps: int = 1000, seek_to_start: bool = true) -> void:
 	stack = Stack.new()
 	while last_step == -1 and current_step <= max_steps:
 		step()
-		print(current_step)
 	if seek_to_start:
 		load_from_state_history(0)
 
@@ -209,6 +207,8 @@ func reset_history() -> void:
 
 ## Translates the difference between two colors into a Pier instruction.
 static func get_instruction(previous_color: Color, current_color: Color) -> StringName:
+	if previous_color == Color.WHITE or current_color == Color.WHITE:
+		return &"noop"
 	var previous_pietcolor := color_to_pietcolor(previous_color)
 	var current_pietcolor := color_to_pietcolor(current_color)
 	if not previous_pietcolor.is_empty() and not current_pietcolor.is_empty():
@@ -227,7 +227,8 @@ static func color_to_pietcolor(color: Color) -> PackedInt32Array:
 
 ## Returns all the codels belonging to the color block of which start_codel is a part of.
 func get_color_block(start_codel: Vector2i, start_codel_color: Color) -> Array[Vector2i]:
-	# TODO Handle white
+	if start_codel_color == Color.WHITE:
+		return [start_codel]
 	var to_explore: Array[Vector2i] = [start_codel]
 	var part_of_block: Array[Vector2i] = []
 	
@@ -403,7 +404,7 @@ func piet_push(value: int) -> void:
 
 ## Pops the top value off the stack and toggles the CC that many times (the absolute value of that many times if negative).
 func piet_switch() -> void:
-	var value = stack.pop()
+	var value := stack.pop()
 	cc_direction = (cc_direction + abs(value)) % 2
 
 
