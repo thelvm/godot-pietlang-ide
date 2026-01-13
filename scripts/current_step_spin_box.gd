@@ -4,8 +4,12 @@ extends SpinBox
 
 
 func _on_pietlang_interpreter_state_updated() -> void:
-	max_value = pietlang_interpreter.last_step - 1
-	value = pietlang_interpreter.current_step
+	if pietlang_interpreter.last_step == -1:
+		allow_greater = true
+	else:
+		allow_greater = false
+		max_value = pietlang_interpreter.last_step - 1
+	set_value_no_signal(pietlang_interpreter.current_step)
 
 
 func _on_value_changed(new_value: float) -> void:
