@@ -230,37 +230,42 @@ func get_color_block(start_codel: Vector2i, start_codel_color: Color) -> Array[V
 	if start_codel_color == Color.WHITE:
 		return [start_codel]
 	var to_explore: Array[Vector2i] = [start_codel]
-	var part_of_block: Array[Vector2i] = []
+	var to_explore_set: Dictionary[Vector2i, bool] = {start_codel: true}
+	var block: Array[Vector2i] = []
+	var block_set: Dictionary[Vector2i, bool] = {}
 	
 	while not to_explore.is_empty():
 		var current: Vector2i = to_explore.pop_back()
-		part_of_block.append(current)
+		to_explore_set.erase(current)
+		
+		block.append(current)
+		block_set[current] = true
 		
 		# right
 		if current.x + 1 < source_image.get_width():
 			var right := Vector2i(current.x + 1, current.y)
-			if source_image.get_pixelv(right) == start_codel_color and not part_of_block.has(right) and not to_explore.has(right):
+			if source_image.get_pixelv(right) == start_codel_color and not block.has(right) and not to_explore.has(right):
 				to_explore.append(right)
 
 		# left
 		if current.x - 1 >= 0:
 			var left := Vector2i(current.x - 1, current.y)
-			if source_image.get_pixelv(left) == start_codel_color and not part_of_block.has(left) and not to_explore.has(left):
+			if source_image.get_pixelv(left) == start_codel_color and not block.has(left) and not to_explore.has(left):
 				to_explore.append(left)
 
 		# down
 		if current.y + 1 < source_image.get_height():
 			var down := Vector2i(current.x, current.y + 1)
-			if source_image.get_pixelv(down) == start_codel_color and not part_of_block.has(down) and not to_explore.has(down):
+			if source_image.get_pixelv(down) == start_codel_color and not block.has(down) and not to_explore.has(down):
 				to_explore.append(down)
 
 		# up
 		if current.y - 1 >= 0:
 			var up := Vector2i(current.x, current.y - 1)
-			if source_image.get_pixelv(up) == start_codel_color and not part_of_block.has(up) and not to_explore.has(up):
+			if source_image.get_pixelv(up) == start_codel_color and not block.has(up) and not to_explore.has(up):
 				to_explore.append(up)
 	
-	return part_of_block
+	return block
 
 
 ## Given the color block, uses the current dp_position, dp_direction and cc_direction to figure out the next codel.
