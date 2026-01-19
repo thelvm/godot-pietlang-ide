@@ -1,0 +1,49 @@
+[gd_scene format=3 uid="uid://dwo7tni0hgoy"]
+
+[ext_resource type="Script" uid="uid://dm2w25fi0h3hs" path="res://scripts/stack_value_ui.gd" id="1_o00s5"]
+
+[node name="StackValueUi" type="PanelContainer" unique_id=2117641643]
+offset_right = 11.0
+offset_bottom = 23.0
+size_flags_horizontal = 3
+theme_type_variation = &"StackValue"
+script = ExtResource("1_o00s5")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=820618349]
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="HBoxContainer" unique_id=1018294858]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="IntValueLabel" type="Label" parent="HBoxContainer/MarginContainer" unique_id=1187786592]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"StackValueLabel"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="MarginContainer3" type="MarginContainer" parent="HBoxContainer" unique_id=1853469197]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="HexValueLabel" type="Label" parent="HBoxContainer/MarginContainer3" unique_id=1916522878]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"StackValueLabel"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="MarginContainer2" type="MarginContainer" parent="HBoxContainer" unique_id=2034621577]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ASCIIValueLabel" type="Label" parent="HBoxContainer/MarginContainer2" unique_id=1524692067]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"StackValueLabel"
+horizontal_alignment = 2
+vertical_alignment = 1

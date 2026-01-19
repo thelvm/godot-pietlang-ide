@@ -1,13 +1,16 @@
-[gd_scene load_steps=11 format=3 uid="uid://bxrxbs3158s50"]
+[gd_scene format=3 uid="uid://bxrxbs3158s50"]
 
-[ext_resource type="Theme" uid="uid://b1w65fnqfb7st" path="res://mondrian.tres" id="1_5vw27"]
-[ext_resource type="Script" uid="uid://y7ami2ldov1m" path="res://main.gd" id="1_ig7tw"]
-[ext_resource type="Script" uid="uid://cds82uvwogchw" path="res://pietlang_interpreter.gd" id="2_0xm2m"]
-[ext_resource type="Texture2D" uid="uid://buukcn6qwoew0" path="res://right-arrow.png" id="2_1bvp3"]
-[ext_resource type="Script" uid="uid://cabqtn5b0kawc" path="res://dp_image.gd" id="3_lquwl"]
-[ext_resource type="Script" uid="uid://bd7pgpf2yo7h" path="res://last_instruction_label.gd" id="4_lquwl"]
-[ext_resource type="Script" uid="uid://tg374t8mge4w" path="res://stack_visualizer.gd" id="5_7mycd"]
-[ext_resource type="Script" uid="uid://ch0c2fpvtng6q" path="res://output_label.gd" id="6_272bh"]
+[ext_resource type="Theme" uid="uid://b1w65fnqfb7st" path="res://themes/mondrian.tres" id="1_5vw27"]
+[ext_resource type="Script" uid="uid://y7ami2ldov1m" path="res://scripts/main.gd" id="1_ig7tw"]
+[ext_resource type="Script" uid="uid://cds82uvwogchw" path="res://scripts/pietlang_interpreter.gd" id="2_0xm2m"]
+[ext_resource type="Texture2D" uid="uid://buukcn6qwoew0" path="res://textures/right-arrow.png" id="2_1bvp3"]
+[ext_resource type="Script" uid="uid://cm8r7reiih038" path="res://scripts/current_step_spin_box.gd" id="3_efxa6"]
+[ext_resource type="Script" uid="uid://tphixnkitd24" path="res://scripts/source_code_texture_rect.gd" id="3_kek77"]
+[ext_resource type="Script" uid="uid://cabqtn5b0kawc" path="res://scripts/dp_image.gd" id="3_lquwl"]
+[ext_resource type="Script" uid="uid://bd7pgpf2yo7h" path="res://scripts/last_instruction_label.gd" id="4_lquwl"]
+[ext_resource type="Script" uid="uid://tg374t8mge4w" path="res://scripts/stack_visualizer.gd" id="5_7mycd"]
+[ext_resource type="Script" uid="uid://dvkhxb4lbbw7x" path="res://scripts/execution_path_line.gd" id="6_4c57u"]
+[ext_resource type="Script" uid="uid://ch0c2fpvtng6q" path="res://scripts/output_label.gd" id="6_272bh"]
 
 [sub_resource type="GDScript" id="GDScript_kek77"]
 resource_name = "ImportSourceImageButton"
@@ -20,19 +23,7 @@ func _on_pietlang_interpreter_source_image_set() -> void:
 	visible = false
 "
 
-[sub_resource type="GDScript" id="GDScript_5vw27"]
-resource_name = "SourceCodeImage"
-script/source = "extends TextureRect
-
-@onready var pietlang_interpreter: PietlangInterpreter = %PietlangInterpreter
-
-
-func _on_pietlang_interpreter_source_image_set() -> void:
-	texture = ImageTexture.create_from_image(pietlang_interpreter.source_image)
-	visible = true
-"
-
-[node name="Main" type="Control"]
+[node name="Main" type="Control" unique_id=455685000]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -44,7 +35,7 @@ size_flags_vertical = 3
 theme = ExtResource("1_5vw27")
 script = ExtResource("1_ig7tw")
 
-[node name="PanelContainer" type="PanelContainer" parent="."]
+[node name="PanelContainer" type="PanelContainer" parent="." unique_id=1359434780]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -52,40 +43,52 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="GridContainer" type="VSplitContainer" parent="PanelContainer"]
+[node name="GridContainer" type="VSplitContainer" parent="PanelContainer" unique_id=1654091300]
 layout_mode = 2
 
-[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/GridContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/GridContainer" unique_id=2050026628]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="ProgramControl" type="VBoxContainer" parent="PanelContainer/GridContainer/HBoxContainer"]
+[node name="ProgramControl" type="VBoxContainer" parent="PanelContainer/GridContainer/HBoxContainer" unique_id=2139573469]
 layout_mode = 2
 alignment = 1
 
-[node name="ImportSourceImageButton" type="Button" parent="PanelContainer/GridContainer/HBoxContainer/ProgramControl"]
+[node name="ImportSourceImageButton" type="Button" parent="PanelContainer/GridContainer/HBoxContainer/ProgramControl" unique_id=341226011]
 layout_mode = 2
 size_flags_vertical = 4
 text = "Import Image"
 script = SubResource("GDScript_kek77")
 
-[node name="StepButton" type="Button" parent="PanelContainer/GridContainer/HBoxContainer/ProgramControl"]
+[node name="StepButton" type="Button" parent="PanelContainer/GridContainer/HBoxContainer/ProgramControl" unique_id=1272810666]
 layout_mode = 2
 size_flags_vertical = 4
 text = "Step"
 
-[node name="VSeparator2" type="VSeparator" parent="PanelContainer/GridContainer/HBoxContainer"]
+[node name="CurrentStepSpinBox" type="SpinBox" parent="PanelContainer/GridContainer/HBoxContainer/ProgramControl" unique_id=1343669012]
+layout_mode = 2
+rounded = true
+alignment = 1
+prefix = "Step"
+script = ExtResource("3_efxa6")
+
+[node name="StepBackButton" type="Button" parent="PanelContainer/GridContainer/HBoxContainer/ProgramControl" unique_id=539290334]
+layout_mode = 2
+size_flags_vertical = 4
+text = "Step Back"
+
+[node name="VSeparator2" type="VSeparator" parent="PanelContainer/GridContainer/HBoxContainer" unique_id=411433571]
 layout_mode = 2
 
-[node name="HSplitContainer" type="HSplitContainer" parent="PanelContainer/GridContainer/HBoxContainer"]
+[node name="HSplitContainer" type="HSplitContainer" parent="PanelContainer/GridContainer/HBoxContainer" unique_id=1499991943]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="SourceCodeElements" type="MarginContainer" parent="PanelContainer/GridContainer/HBoxContainer/HSplitContainer"]
+[node name="SourceCodeElements" type="MarginContainer" parent="PanelContainer/GridContainer/HBoxContainer/HSplitContainer" unique_id=627455128]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="SourceCodeImage" type="TextureRect" parent="PanelContainer/GridContainer/HBoxContainer/HSplitContainer/SourceCodeElements"]
+[node name="SourceCodeImage" type="TextureRect" parent="PanelContainer/GridContainer/HBoxContainer/HSplitContainer/SourceCodeElements" unique_id=2056247799]
 unique_name_in_owner = true
 visible = false
 texture_filter = 1
@@ -94,42 +97,50 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 expand_mode = 1
 stretch_mode = 5
-script = SubResource("GDScript_5vw27")
+script = ExtResource("3_kek77")
 
-[node name="DpImage" type="Sprite2D" parent="PanelContainer/GridContainer/HBoxContainer/HSplitContainer/SourceCodeElements/SourceCodeImage"]
+[node name="DpImage" type="Sprite2D" parent="PanelContainer/GridContainer/HBoxContainer/HSplitContainer/SourceCodeElements/SourceCodeImage" unique_id=1716526769]
 texture = ExtResource("2_1bvp3")
 script = ExtResource("3_lquwl")
 
-[node name="RuntimeVariables" type="VBoxContainer" parent="PanelContainer/GridContainer/HBoxContainer/HSplitContainer"]
+[node name="ExecutionPath" type="Line2D" parent="PanelContainer/GridContainer/HBoxContainer/HSplitContainer/SourceCodeElements/SourceCodeImage" unique_id=1642781427]
+default_color = Color(0.46618086, 0.4661808, 0.4661808, 1)
+joint_mode = 2
+begin_cap_mode = 2
+end_cap_mode = 2
+antialiased = true
+script = ExtResource("6_4c57u")
+
+[node name="RuntimeVariables" type="VBoxContainer" parent="PanelContainer/GridContainer/HBoxContainer/HSplitContainer" unique_id=2143194420]
 layout_mode = 2
 
-[node name="PanelContainer2" type="PanelContainer" parent="PanelContainer/GridContainer/HBoxContainer/HSplitContainer/RuntimeVariables"]
+[node name="PanelContainer2" type="PanelContainer" parent="PanelContainer/GridContainer/HBoxContainer/HSplitContainer/RuntimeVariables" unique_id=1228631748]
 layout_mode = 2
 theme_type_variation = &"BluePanelContainer"
 
-[node name="MarginContainer2" type="MarginContainer" parent="PanelContainer/GridContainer/HBoxContainer/HSplitContainer/RuntimeVariables/PanelContainer2"]
+[node name="MarginContainer2" type="MarginContainer" parent="PanelContainer/GridContainer/HBoxContainer/HSplitContainer/RuntimeVariables/PanelContainer2" unique_id=775476825]
 layout_mode = 2
 
-[node name="LastInstructionLabel" type="Label" parent="PanelContainer/GridContainer/HBoxContainer/HSplitContainer/RuntimeVariables/PanelContainer2/MarginContainer2"]
+[node name="LastInstructionLabel" type="Label" parent="PanelContainer/GridContainer/HBoxContainer/HSplitContainer/RuntimeVariables/PanelContainer2/MarginContainer2" unique_id=490825518]
 layout_mode = 2
 text = "INSTRUCTION"
 horizontal_alignment = 1
 script = ExtResource("4_lquwl")
 
-[node name="HSeparator2" type="HSeparator" parent="PanelContainer/GridContainer/HBoxContainer/HSplitContainer/RuntimeVariables"]
+[node name="HSeparator2" type="HSeparator" parent="PanelContainer/GridContainer/HBoxContainer/HSplitContainer/RuntimeVariables" unique_id=585543577]
 layout_mode = 2
 
-[node name="PanelContainer" type="PanelContainer" parent="PanelContainer/GridContainer/HBoxContainer/HSplitContainer/RuntimeVariables"]
+[node name="PanelContainer" type="PanelContainer" parent="PanelContainer/GridContainer/HBoxContainer/HSplitContainer/RuntimeVariables" unique_id=1510140789]
 layout_mode = 2
 size_flags_vertical = 3
 theme_type_variation = &"YellowPanelContainer"
 
-[node name="ScrollContainer" type="ScrollContainer" parent="PanelContainer/GridContainer/HBoxContainer/HSplitContainer/RuntimeVariables/PanelContainer"]
+[node name="ScrollContainer" type="ScrollContainer" parent="PanelContainer/GridContainer/HBoxContainer/HSplitContainer/RuntimeVariables/PanelContainer" unique_id=2088535240]
 layout_mode = 2
 size_flags_vertical = 3
 horizontal_scroll_mode = 0
 
-[node name="StackVisualizer" type="VBoxContainer" parent="PanelContainer/GridContainer/HBoxContainer/HSplitContainer/RuntimeVariables/PanelContainer/ScrollContainer"]
+[node name="StackVisualizer" type="VBoxContainer" parent="PanelContainer/GridContainer/HBoxContainer/HSplitContainer/RuntimeVariables/PanelContainer/ScrollContainer" unique_id=527700154]
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
 size_flags_horizontal = 3
@@ -137,50 +148,56 @@ size_flags_vertical = 3
 alignment = 2
 script = ExtResource("5_7mycd")
 
-[node name="HSeparator" type="HSeparator" parent="PanelContainer/GridContainer/HBoxContainer/HSplitContainer/RuntimeVariables"]
+[node name="HSeparator" type="HSeparator" parent="PanelContainer/GridContainer/HBoxContainer/HSplitContainer/RuntimeVariables" unique_id=1596062028]
 layout_mode = 2
 
-[node name="MarginContainer" type="MarginContainer" parent="PanelContainer/GridContainer/HBoxContainer/HSplitContainer/RuntimeVariables"]
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer/GridContainer/HBoxContainer/HSplitContainer/RuntimeVariables" unique_id=265940419]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="PanelContainer/GridContainer/HBoxContainer/HSplitContainer/RuntimeVariables/MarginContainer"]
+[node name="Label" type="Label" parent="PanelContainer/GridContainer/HBoxContainer/HSplitContainer/RuntimeVariables/MarginContainer" unique_id=749450646]
 layout_mode = 2
 text = "Stack"
 horizontal_alignment = 1
 
-[node name="HBoxContainer2" type="HBoxContainer" parent="PanelContainer/GridContainer"]
+[node name="HBoxContainer2" type="HBoxContainer" parent="PanelContainer/GridContainer" unique_id=1086261391]
 layout_mode = 2
 
-[node name="MarginContainer" type="MarginContainer" parent="PanelContainer/GridContainer/HBoxContainer2"]
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer/GridContainer/HBoxContainer2" unique_id=540802423]
 layout_mode = 2
 
-[node name="Label2" type="Label" parent="PanelContainer/GridContainer/HBoxContainer2/MarginContainer"]
+[node name="Label2" type="Label" parent="PanelContainer/GridContainer/HBoxContainer2/MarginContainer" unique_id=1576368591]
 layout_mode = 2
 size_flags_horizontal = 8
 text = "Output"
 
-[node name="VSeparator" type="VSeparator" parent="PanelContainer/GridContainer/HBoxContainer2"]
+[node name="VSeparator" type="VSeparator" parent="PanelContainer/GridContainer/HBoxContainer2" unique_id=197509133]
 layout_mode = 2
 
-[node name="PanelContainer" type="PanelContainer" parent="PanelContainer/GridContainer/HBoxContainer2"]
+[node name="PanelContainer" type="PanelContainer" parent="PanelContainer/GridContainer/HBoxContainer2" unique_id=525707235]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_type_variation = &"RedPanelContainer"
 
-[node name="MarginContainer" type="MarginContainer" parent="PanelContainer/GridContainer/HBoxContainer2/PanelContainer"]
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer/GridContainer/HBoxContainer2/PanelContainer" unique_id=1184129326]
 layout_mode = 2
 
-[node name="OutputLabel" type="Label" parent="PanelContainer/GridContainer/HBoxContainer2/PanelContainer/MarginContainer"]
+[node name="OutputLabel" type="Label" parent="PanelContainer/GridContainer/HBoxContainer2/PanelContainer/MarginContainer" unique_id=1394969693]
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 0
 script = ExtResource("6_272bh")
 
-[node name="PietlangInterpreter" type="Node" parent="."]
+[node name="PietlangInterpreter" type="Node" parent="." unique_id=1830919467]
 unique_name_in_owner = true
 script = ExtResource("2_0xm2m")
 
 [connection signal="pressed" from="PanelContainer/GridContainer/HBoxContainer/ProgramControl/ImportSourceImageButton" to="." method="_on_import_source_image_button_pressed"]
 [connection signal="pressed" from="PanelContainer/GridContainer/HBoxContainer/ProgramControl/StepButton" to="PietlangInterpreter" method="step"]
-[connection signal="source_image_set" from="PietlangInterpreter" to="PanelContainer/GridContainer/HBoxContainer/HSplitContainer/SourceCodeElements/SourceCodeImage" method="_on_pietlang_interpreter_source_image_set"]
+[connection signal="value_changed" from="PanelContainer/GridContainer/HBoxContainer/ProgramControl/CurrentStepSpinBox" to="PanelContainer/GridContainer/HBoxContainer/ProgramControl/CurrentStepSpinBox" method="_on_value_changed"]
+[connection signal="pressed" from="PanelContainer/GridContainer/HBoxContainer/ProgramControl/StepBackButton" to="PietlangInterpreter" method="step_back"]
+[connection signal="resized" from="PanelContainer/GridContainer/HBoxContainer/HSplitContainer/SourceCodeElements/SourceCodeImage" to="PanelContainer/GridContainer/HBoxContainer/HSplitContainer/SourceCodeElements/SourceCodeImage" method="_on_resized"]
 [connection signal="source_image_set" from="PietlangInterpreter" to="PanelContainer/GridContainer/HBoxContainer/ProgramControl/ImportSourceImageButton" method="_on_pietlang_interpreter_source_image_set"]
+[connection signal="source_image_set" from="PietlangInterpreter" to="PanelContainer/GridContainer/HBoxContainer/HSplitContainer/SourceCodeElements/SourceCodeImage" method="_on_pietlang_interpreter_source_image_set"]
+[connection signal="state_updated" from="PietlangInterpreter" to="PanelContainer/GridContainer/HBoxContainer/ProgramControl/CurrentStepSpinBox" method="_on_pietlang_interpreter_state_updated"]
+[connection signal="state_updated" from="PietlangInterpreter" to="PanelContainer/GridContainer/HBoxContainer/HSplitContainer/SourceCodeElements/SourceCodeImage/DpImage" method="_update"]
+[connection signal="state_updated" from="PietlangInterpreter" to="PanelContainer/GridContainer/HBoxContainer/HSplitContainer/SourceCodeElements/SourceCodeImage/ExecutionPath" method="_on_pietlang_interpreter_state_updated"]
